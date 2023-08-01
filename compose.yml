@@ -1,0 +1,12 @@
+version: '3'
+services:
+
+  web:
+    build: ./python
+    ports:
+     - 80:80
+    volumes:
+     - ./python/src:/app/src
+
+
+    

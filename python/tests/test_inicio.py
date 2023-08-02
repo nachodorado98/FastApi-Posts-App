@@ -2,4 +2,7 @@ def test_pagina_inicio(cliente):
 
 	contenido=cliente.get("/").json()
 
-	assert contenido=={"Bienvenido":"Hola Mundo"}
+	assert "mensaje" in contenido
+	assert "version" in contenido
+	assert "descripcion" in contenido
+	assert "documentacion" in contenido

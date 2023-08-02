@@ -3,8 +3,11 @@ import sys
 sys.path.append("..")
 
 import pytest
-from src import crear_app
 from fastapi.testclient import TestClient 
+
+from src import crear_app
+from src.database.conexion import Conexion
+
 
 @pytest.fixture()
 def app():
@@ -19,3 +22,8 @@ def cliente(app):
 
 	return TestClient(app)
 
+
+@pytest.fixture()
+def conexion():
+
+	return Conexion()

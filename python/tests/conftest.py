@@ -26,4 +26,10 @@ def cliente(app):
 @pytest.fixture()
 def conexion():
 
-	return Conexion()
+	conexion=Conexion()
+
+	conexion.c.execute("DELETE FROM posts")
+
+	conexion.bbdd.commit()
+
+	return conexion

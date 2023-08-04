@@ -107,6 +107,38 @@ def test_actualizar_post_id(conexion):
 	assert post_actualizado["fecha"]==datetime.date(2023, 8, 3)
 
 
+def test_eliminar_posts(conexion):
+
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+	conexion.insertarPost("Titulo2", "Contenido1", "2023-08-04")
+	conexion.insertarPost("Titulo3", "Contenido2", "2023-08-05")
+
+	assert len(conexion.obtenerPosts())==3
+
+	conexion.eliminarPosts()
+
+	assert len(conexion.obtenerPosts())==0
+
+
+def test_eliminar_post_id(conexion):
+
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+
+	post=conexion.obtenerPosts()[0]
+
+	id_post=post["id"]
+
+	assert not conexion.obtenerPost(id_post) is None
+
+	conexion.eliminarPost(id_post)
+
+	assert conexion.obtenerPost(id_post) is None
+
+
+
+
+
+
 
 
 

@@ -174,3 +174,83 @@ def test_actualizar_post_existente(cliente, conexion):
 	assert respuesta_actualizado.status_code==200
 	assert contenido["titulo"]=="Titulo nuevo"
 	assert contenido["contenido"]=="Contenido nuevo del post"
+
+
+def test_eliminar_posts_existentes(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get("/posts")
+
+	assert len(respuesta.json())==3
+
+	respuesta_eliminar=cliente.delete("/posts")
+
+	contenido=respuesta_eliminar.json()
+
+	assert respuesta_eliminar.status_code==200
+	assert "mensaje" in contenido
+
+	respuesta_verificar=cliente.get("/posts")
+
+	assert len(respuesta_verificar.json())==0
+
+
+
+
+
+
+
+@pytest.mark.parametrize(["id_incorrecto"],
+	[("uno",),("hola",), ("dos",)]
+)
+def test_eliminar_post_incorrecto(cliente, conexion, id_incorrecto):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.delete(f"/posts/{id_incorrecto}")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==422
+	assert not "mensaje" in contenido
+
+
+@pytest.mark.parametrize(["id_no_existe"],
+	[("0",),("1",), ("-1",)]
+)
+def test_eliminar_post_no_existente(cliente, conexion, id_no_existe):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.delete(f"/posts/{id_no_existe}")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==404
+	assert "detail" in contenido
+
+
+def test_eliminar_post_existente(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get("/posts")
+
+	post=respuesta.json()[0]
+
+	id_post=post["id"]
+
+	respuesta_eliminado=cliente.delete(f"/posts/{id_post}")
+
+	contenido=respuesta_eliminado.json()
+
+	assert respuesta_eliminado.status_code==200
+	assert "mensaje" in contenido
+
+	respuesta_verificar=cliente.get("/posts")
+
+	assert len(respuesta_verificar.json())==0
+

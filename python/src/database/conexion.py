@@ -52,13 +52,29 @@ class Conexion:
 
 		return self.c.fetchone()
 
-	# Metodo para actualizar un post
+	# Metodo para actualizar un post por su id
 	def actualizarPost(self, identificador:int, titulo:str, contenido:str)->None:
 
 		self.c.execute("""UPDATE posts
 						SET titulo=%s, contenido=%s
 						WHERE id=%s""",
 						(titulo, contenido, identificador))
+
+		self.bbdd.commit()
+
+	# Metodo para eliminar todos los posts
+	def eliminarPosts(self)->None:
+
+		self.c.execute("""DELETE FROM posts""")
+
+		self.bbdd.commit()
+
+	# Metodo para eliminar un post por su id
+	def eliminarPost(self, identificador:int)->None:
+
+		self.c.execute("""DELETE FROM posts
+						WHERE id=%s""",
+						(identificador,))
 
 		self.bbdd.commit()
 

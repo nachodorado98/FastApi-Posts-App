@@ -133,3 +133,57 @@ async def actualizarPost(post:PostBasico,
 
 	return {"mensaje":"Post actualizado con exito",
 			"post":post}
+
+
+@router_posts.delete("", status_code=status.HTTP_200_OK, summary="Elimina todos los posts existentes")
+async def eliminarPosts(con:Conexion=Depends(crearConexion))->Dict:
+
+	"""
+	Elimina los diccionarios que representan los posts disponibles.
+
+	## Respuesta
+
+	200 (OK): Si se eliminan los posts correctamente
+
+	-  **Mensaje**: El mensaje de eliminacion correcto de los posts (str).
+	"""
+
+	con.eliminarPosts()
+
+	con.cerrarConexion()
+
+	return {"mensaje":"Posts eliminados con exito"}
+
+
+@router_posts.delete("/{id_post}", status_code=status.HTTP_200_OK, summary="Elimina el post indicado")
+async def eliminarPost(id_post:int=Path(..., title="Id del post", description="Id unico del post que quieres actualizar"),
+						con:Conexion=Depends(crearConexion))->Dict:
+
+	"""
+	Elimina el diccionario del post buscado a traves de su id.
+
+	## Parametros
+
+	- **Id_post**: El ID del post (int).
+
+	## Respuesta
+
+	200 (OK): Si se elimina el post correctamente
+
+	-  **Mensaje**: El mensaje de eliminacion correcto del post (str).
+
+	404 (NOT FOUND): Si no se elimina el post correctamente
+
+	- **Detail**: El mensaje del detalle de la excepcion (str).
+
+	"""
+
+	if con.obtenerPost(id_post) is None:
+
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post no existente")
+
+	con.eliminarPost(id_post)
+
+	con.cerrarConexion()
+
+	return {"mensaje":"Post eliminado con exito"}

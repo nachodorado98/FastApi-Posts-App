@@ -64,3 +64,113 @@ def test_obtener_posts(cliente, conexion):
 	assert respuesta.status_code==200
 	assert contenido[0]["titulo"]=="Titulo del post"
 	assert contenido[0]["contenido"]=="Contenido del post"
+
+
+@pytest.mark.parametrize(["id_incorrecto"],
+	[("uno",),("hola",), ("dos",)]
+)
+def test_obtener_post_incorrecto(cliente, conexion, id_incorrecto):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get(f"/posts/{id_incorrecto}")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==422
+	assert not "titulo" in contenido
+	assert not "contenido" in contenido
+
+
+@pytest.mark.parametrize(["id_no_existe"],
+	[("0",),("1",), ("-1",)]
+)
+def test_obtener_post_no_existente(cliente, conexion, id_no_existe):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get(f"/posts/{id_no_existe}")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==404
+	assert "detail" in contenido
+
+
+def test_obtener_post_existente(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get("/posts")
+
+	post=respuesta.json()[0]
+
+	id_post=post["id"]
+
+	respuesta_buscado=cliente.get(f"/posts/{id_post}")
+
+	contenido=respuesta_buscado.json()
+
+	assert respuesta_buscado.status_code==200
+	assert contenido["titulo"]=="Titulo del post"
+	assert contenido["contenido"]=="Contenido del post"
+
+
+@pytest.mark.parametrize(["id_incorrecto", "post"],
+	[
+		("uno", {"titulo":"Titulo nuevo del post", "contenido":"Contenido nuevo del post"}),
+		("hola", {"titulo":"Titulo nuevo del post", "contenido":"Contenido nuevo del post"}),
+		("dos", {"titulo":"Titulo nuevo del post", "contenido":"Contenido nuevo del post"}),
+		("1", {"titulo":"Titulo nuevo del post", "contenido":1}),
+		("22", {"titulo":"Titulo nuevo del post"}),
+		("6", {"contenido":"Contenido nuevo del post"}),
+		("13", {}),
+	]
+)
+def test_actualizar_post_incorrecto(cliente, conexion, id_incorrecto, post):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.put(f"/posts/{id_incorrecto}", json=post)
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==422
+	assert not "mensaje" in contenido
+	assert not "post" in contenido
+
+
+@pytest.mark.parametrize(["id_no_existe"],
+	[("0",),("1",), ("-1",)]
+)
+def test_actualizar_post_no_existente(cliente, conexion, id_no_existe):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.put(f"/posts/{id_no_existe}", json={"titulo":"Titulo nuevo del post", "contenido":"Contenido nuevo del post"})
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==404
+	assert "detail" in contenido
+
+
+def test_actualizar_post_existente(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get("/posts")
+
+	post=respuesta.json()[0]
+
+	id_post=post["id"]
+
+	cliente.put(f"/posts/{id_post}", json={"titulo":"Titulo nuevo", "contenido":"Contenido nuevo del post"})
+
+	respuesta_actualizado=cliente.get(f"/posts/{id_post}")
+
+	contenido=respuesta_actualizado.json()
+
+	assert respuesta_actualizado.status_code==200
+	assert contenido["titulo"]=="Titulo nuevo"
+	assert contenido["contenido"]=="Contenido nuevo del post"

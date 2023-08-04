@@ -73,6 +73,42 @@ def test_insertar_multiples_posts(conexion):
 	assert len(posts)==3
 
 
+def test_obtener_post_id(conexion):
+
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+
+	post=conexion.obtenerPosts()[0]
+
+	id_post=post["id"]
+
+	post_buscado=conexion.obtenerPost(id_post)
+
+	assert post_buscado["id"]==id_post
+	assert post_buscado["titulo"]=="Titulo"
+	assert post_buscado["contenido"]=="Contenido"
+	assert post_buscado["fecha"]==datetime.date(2023, 8, 3)
+
+
+def test_actualizar_post_id(conexion):
+
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+
+	post=conexion.obtenerPosts()[0]
+
+	id_post=post["id"]
+
+	conexion.actualizarPost(id_post, "Nuevo Titulo", "Nuevo Contenido")
+
+	post_actualizado=conexion.obtenerPost(id_post)
+
+	assert post_actualizado["id"]==id_post
+	assert post_actualizado["titulo"]=="Nuevo Titulo"
+	assert post_actualizado["contenido"]=="Nuevo Contenido"
+	assert post_actualizado["fecha"]==datetime.date(2023, 8, 3)
+
+
+
+
 
 
 

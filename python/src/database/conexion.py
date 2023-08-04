@@ -42,17 +42,25 @@ class Conexion:
 
 		self.bbdd.commit()
 
+	# Metodo para obtener un post por su id
+	def obtenerPost(self, identificador:int)->Optional[Dict]:
 
-# Funcion para devolver el objeto de la conexion
-def obtenerConexion()->Optional[Conexion]:
+		self.c.execute("""SELECT *
+						FROM posts
+						WHERE id=%s""",
+						(identificador,))
 
-	con=Conexion()
+		return self.c.fetchone()
 
-	try: 
+	# Metodo para actualizar un post
+	def actualizarPost(self, identificador:int, titulo:str, contenido:str)->None:
 
-		yield con
+		self.c.execute("""UPDATE posts
+						SET titulo=%s, contenido=%s
+						WHERE id=%s""",
+						(titulo, contenido, identificador))
 
-	except:
+		self.bbdd.commit()
 
-		con.cerrarConexion()
+
 

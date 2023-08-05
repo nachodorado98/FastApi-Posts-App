@@ -78,5 +78,24 @@ class Conexion:
 
 		self.bbdd.commit()
 
+	# Metodo para obtener el ultimo post
+	def obtenerUltimo(self)->Optional[Dict]:
+
+		self.c.execute("""SELECT *
+						FROM posts
+						WHERE id=(SELECT MAX(id)
+								FROM posts)""")
+
+		return self.c.fetchone()
+
+	# Metodo para obtener el primer post
+	def obtenerPrimero(self)->Optional[Dict]:
+
+		self.c.execute("""SELECT *
+						FROM posts
+						WHERE id=(SELECT MIN(id)
+								FROM posts)""")
+
+		return self.c.fetchone()
 
 

@@ -73,7 +73,7 @@ def test_insertar_multiples_posts(conexion):
 	assert len(posts)==3
 
 
-def test_obtener_post_id(conexion):
+def test_obtener_post_id_existe(conexion):
 
 	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
 
@@ -87,6 +87,11 @@ def test_obtener_post_id(conexion):
 	assert post_buscado["titulo"]=="Titulo"
 	assert post_buscado["contenido"]=="Contenido"
 	assert post_buscado["fecha"]==datetime.date(2023, 8, 3)
+
+
+def test_obtener_post_id_no_existe(conexion):
+
+	assert conexion.obtenerPost(1) is None
 
 
 def test_actualizar_post_id(conexion):
@@ -133,6 +138,48 @@ def test_eliminar_post_id(conexion):
 	conexion.eliminarPost(id_post)
 
 	assert conexion.obtenerPost(id_post) is None
+
+
+def test_obtener_ultimo_post_existe(conexion):
+
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-03")
+	conexion.insertarPost("Titulo ultimo", "Contenido ultimo", "2023-08-05")
+
+	ultimo_post=conexion.obtenerUltimo()
+
+	assert ultimo_post["titulo"]=="Titulo ultimo"
+	assert ultimo_post["contenido"]=="Contenido ultimo"
+	assert ultimo_post["fecha"]==datetime.date(2023, 8, 5)
+
+
+def test_obtener_ultimo_post_no_existe(conexion):
+
+	assert conexion.obtenerUltimo() is None
+
+
+def test_obtener_primer_post_existe(conexion):
+
+	conexion.insertarPost("Titulo primero", "Contenido primero", "2023-08-03")
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-05")
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-05")
+	conexion.insertarPost("Titulo", "Contenido", "2023-08-05")
+
+	primer_post=conexion.obtenerPrimero()
+
+	assert primer_post["titulo"]=="Titulo primero"
+	assert primer_post["contenido"]=="Contenido primero"
+	assert primer_post["fecha"]==datetime.date(2023, 8, 3)
+
+
+def test_obtener_primer_post_no_existe(conexion):
+
+	assert conexion.obtenerPrimero() is None
+
+
+
+
 
 
 

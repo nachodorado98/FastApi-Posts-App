@@ -198,11 +198,6 @@ def test_eliminar_posts_existentes(cliente, conexion):
 	assert len(respuesta_verificar.json())==0
 
 
-
-
-
-
-
 @pytest.mark.parametrize(["id_incorrecto"],
 	[("uno",),("hola",), ("dos",)]
 )
@@ -254,3 +249,66 @@ def test_eliminar_post_existente(cliente, conexion):
 
 	assert len(respuesta_verificar.json())==0
 
+
+def test_obtener_ultimo_post_no_existente(cliente, conexion):
+
+	respuesta=cliente.get(f"/posts/ultimo")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==404
+	assert "detail" in contenido
+
+
+def test_obtener_ultimo_post_existente(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+	cliente.post("/posts", json={"titulo":"Titulo ultimo", "contenido":"Contenido ultimo"})
+
+	respuesta=cliente.get(f"/posts/ultimo")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==200
+	assert contenido["titulo"]=="Titulo ultimo"
+	assert contenido["contenido"]=="Contenido ultimo"
+
+
+def test_obtener_primer_post_no_existente(cliente, conexion):
+
+	respuesta=cliente.get(f"/posts/primero")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==404
+	assert "detail" in contenido
+
+
+def test_obtener_primer_post_existente(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Titulo primero", "contenido":"Contenido primero"})
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+	cliente.post("/posts", json={"titulo":"Titulo del post", "contenido":"Contenido del post"})
+
+	respuesta=cliente.get(f"/posts/primero")
+
+	contenido=respuesta.json()
+
+	assert respuesta.status_code==200
+	assert contenido["titulo"]=="Titulo primero"
+	assert contenido["contenido"]=="Contenido primero"
+
+
+def test_obtener_primer_ultimo_post_existente(cliente, conexion):
+
+	cliente.post("/posts", json={"titulo":"Primero ultimo", "contenido":"Contenido primero ultimo"})
+
+	contenido_primero=cliente.get(f"/posts/primero").json()
+
+	contenido_ultimo=cliente.get(f"/posts/ultimo").json()
+
+	assert contenido_primero["titulo"]==contenido_ultimo["titulo"]
+	assert contenido_primero["contenido"]==contenido_ultimo["contenido"]
+
+	

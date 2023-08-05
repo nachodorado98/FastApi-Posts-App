@@ -59,6 +59,74 @@ async def agregarPost(post:PostBasico, con:Conexion=Depends(crearConexion))->Dic
 			"post":post}
 
 
+@router_posts.get("/ultimo", status_code=status.HTTP_200_OK, summary="Devuelve el ultimo post")
+async def obtenerUltimo(con:Conexion=Depends(crearConexion))->Post:
+
+	"""
+	Devuelve el diccionario del ultimo post.
+
+	## Respuesta
+
+	200 (OK): Si se obtiene el ultimo post correctamente
+
+	- **Id**: El ID del post (int).
+	- **Titulo**: El titulo del post (str).
+	- **Contenido**: El contenido del post (str).
+	- **Fecha**: La fecha del post (str).
+
+	404 (NOT FOUND): Si no se obtiene el ultimo post correctamente
+
+	- **Detail**: El mensaje del detalle de la excepcion (str).
+
+	"""
+
+	post=con.obtenerUltimo()
+
+	if post is None:
+
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post no existente")
+
+	objeto_post=obtener_objeto_post(post)
+
+	con.cerrarConexion()
+
+	return objeto_post
+
+
+@router_posts.get("/primero", status_code=status.HTTP_200_OK, summary="Devuelve el primer post")
+async def obtenerPrimero(con:Conexion=Depends(crearConexion))->Post:
+
+	"""
+	Devuelve el diccionario del primer post.
+
+	## Respuesta
+
+	200 (OK): Si se obtiene el primer post correctamente
+
+	- **Id**: El ID del post (int).
+	- **Titulo**: El titulo del post (str).
+	- **Contenido**: El contenido del post (str).
+	- **Fecha**: La fecha del post (str).
+
+	404 (NOT FOUND): Si no se obtiene el primer post correctamente
+
+	- **Detail**: El mensaje del detalle de la excepcion (str).
+
+	"""
+
+	post=con.obtenerPrimero()
+
+	if post is None:
+
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post no existente")
+
+	objeto_post=obtener_objeto_post(post)
+
+	con.cerrarConexion()
+
+	return objeto_post
+
+
 @router_posts.get("/{id_post}", status_code=status.HTTP_200_OK, summary="Devuelve el post buscado")
 async def obtenerPost(id_post:int=Path(..., title="Id del post", description="Id unico del post que quieres obtener"),
 						con:Conexion=Depends(crearConexion))->Post:
@@ -187,3 +255,6 @@ async def eliminarPost(id_post:int=Path(..., title="Id del post", description="I
 	con.cerrarConexion()
 
 	return {"mensaje":"Post eliminado con exito"}
+
+
+
